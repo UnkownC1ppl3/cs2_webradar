@@ -6,8 +6,8 @@ import { Radar } from "./Radar/Radar";
 import { getLatency, Latency } from './Latency/Latency';
 import { MaskedIcon } from './MaskedIcon/MaskedIcon';
 
-const USE_LOCALHOST = 1;
-const PUBLIC_IP = "your ip goes here";
+const USE_LOCALHOST = 0;
+const PUBLIC_IP = "204.12.229.242";
 const PORT = 22006;
 
 const App = () => {
