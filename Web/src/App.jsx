@@ -1,14 +1,12 @@
-import ReactDOM from 'react-dom/client'
-import { useEffect, useState } from 'react'
-import './App.css'
+import ReactDOM from 'react-dom/client';
+import { useEffect, useState } from 'react';
+import './App.css';
 import { PlayerCard } from "./PlayerCard/PlayerCard";
 import { Radar } from "./Radar/Radar";
 import { getLatency, Latency } from './Latency/Latency';
 import { MaskedIcon } from './MaskedIcon/MaskedIcon';
 
-// if you want to share the radar, set this to '0', otherwise let it be '1'.
 const USE_LOCALHOST = 1;
-
 const PUBLIC_IP = "your ip goes here";
 const PORT = 22006;
 
@@ -18,22 +16,33 @@ const App = () => {
 	const [mapData, setMapData] = useState();
 	const [localTeam, setLocalTeam] = useState();
 	const [bombData, setBombData] = useState();
+	const [User, setUser] = useState('');
 
 	useEffect(() => {
+		let UserID = prompt("Please enter your User ID:", "");
+		if (UserID !== null && UserID.trim() !== '') {
+			setUser(UserID.trim());
+		} else {
+			// Default User or handle lack of input as needed
+			setUser('default');
+		}
+	}, []);
+
+	useEffect(() => {
+		if (!User) return; // Don't fetch data until a User is set
+
 		const fetchData = async () => {
 			let webSocket = null;
 			let webSocketURL = null;
 
-			if (!webSocket) {
-				if (USE_LOCALHOST) {
-					webSocketURL = `ws://localhost:${PORT}/cs2_webradar`;
-				} else {
-					webSocketURL = `ws://${PUBLIC_IP}:${PORT}/cs2_webradar`;
-				}
-
-				if (!webSocketURL) return;
-				webSocket = new WebSocket(webSocketURL);
+			if (USE_LOCALHOST) {
+				webSocketURL = `ws://localhost:${PORT}/cs2_webradar?User=${User}`;
+			} else {
+				webSocketURL = `ws://${PUBLIC_IP}:${PORT}/cs2_webradar?User=${User}`;
 			}
+
+			if (!webSocketURL) return;
+			webSocket = new WebSocket(webSocketURL);
 
 			webSocket.onopen = async () => {
 				console.info("connected to the web socket");
@@ -65,7 +74,7 @@ const App = () => {
 		};
 
 		fetchData();
-	}, []);
+	}, [User]); // Re-run when User changes
 
 	return (
 		<div className={`w-screen h-screen flex flex-col justify-center backdrop-blur-[7.5px]`} style={{ background: `radial-gradient(50% 50% at 50% 50%, rgba(20, 40, 55, 0.95) 0%, rgba(7, 20, 30, 0.95) 100%)`, backdropFilter: `blur(7.5px)` }}>
@@ -110,7 +119,7 @@ const App = () => {
 				</ul>
 			</div>
 		</div>
-	)
+	);
 }
 
 export default App;
